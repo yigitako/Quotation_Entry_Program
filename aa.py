@@ -1,72 +1,240 @@
 import tkinter as tk
+from tkinter import ttk
+import re
+x = {"Lloyd Inc": [
+    [
+        "98894 Lisa Vista Apt. 072\nJennyberg, DC 03028"
+    ],
+    [
+        "773-214-7873x579"
+    ],
+    [
+        "https://www.king-gregory.net/"
+    ],
+    [
+        "Natalie Jackson"
+    ],
+    [
+        "bradleyrodriguez@example.net"
+    ]
+],
+    "Munoz, Martinez and Ashley": [
+        [
+            "47941 Charles Coves\nNew Madison, AS 80797"
+        ],
+        [
+            "(196)160-6525"
+        ],
+        [
+            "http://mcmahon-mueller.biz/"
+        ],
+        [
+            "Kimberly Miller"
+        ],
+        [
+            "nelsonkristen@example.net"
+        ]
+    ],
+    "Blair-Cross": [
+        [
+            "2454 Brown Ramp\nEast Shannon, IL 34361"
+        ],
+        [
+            "196.781.7855"
+        ],
+        [
+            "https://www.brock-hall.com/"
+        ],
+        [
+            "Timothy Parker"
+        ],
+        [
+            "rodriguezbrenda@example.org"
+        ]
+    ],
+    "Anderson PLC": [
+        [
+            "52412 Pollard Expressway\nNew Joann, MN 23144"
+        ],
+        [
+            "2208013898"
+        ],
+        [
+            "http://www.medina-vargas.com/"
+        ],
+        [
+            "Tamara Hoffman"
+        ],
+        [
+            "wpotter@example.net"
+        ]
+    ],
+    "Zavala Ltd": [
+        [
+            "92882 Cox Keys Apt. 950\nKarenberg, NV 82300"
+        ],
+        [
+            "001-846-918-4534x0511"
+        ],
+        [
+            "https://www.patel.com/"
+        ],
+        [
+            "Curtis Johnson"
+        ],
+        [
+            "alvaradofernando@example.com"
+        ]
+    ],
+    "Martin and Sons": [
+        [
+            "97929 Lopez Mountain Apt. 396\nTaraland, KS 72336"
+        ],
+        [
+            "362-772-7859x03859"
+        ],
+        [
+            "https://johnson.com/"
+        ],
+        [
+            "David Day"
+        ],
+        [
+            "vasquezelizabeth@example.org"
+        ]
+    ],
+    "Reyes, Johnson and King": [
+        [
+            "57645 Kathryn Coves Apt. 534\nEast Robert, MN 12099"
+        ],
+        [
+            "827.334.9240"
+        ],
+        [
+            "http://www.hammond.com/"
+        ],
+        [
+            "Sabrina Russell"
+        ],
+        [
+            "richardsonkenneth@example.com"
+        ]
+    ],
+    "Best and Sons": [
+        [
+            "343 Richardson Estates Suite 415\nTiffanyshire, NH 44770"
+        ],
+        [
+            "001-065-485-4254x0435"
+        ],
+        [
+            "http://www.smith.net/"
+        ],
+        [
+            "Eric Martinez"
+        ],
+        [
+            "qfoster@example.net"
+        ]
+    ],
+    "Simmons, Lynch and Lynn": [
+        [
+            "5883 Gill Mount\nWest Sharonland, FM 77120"
+        ],
+        [
+            "(572)128-2188x0942"
+        ],
+        [
+            "http://thompson-graham.com/"
+        ],
+        [
+            "Emily Baker"
+        ],
+        [
+            "csoto@example.com"
+        ]
+    ],
+    "Moore, Mccarthy and Davis": [
+        [
+            "046 Joshua Rest\nLake Benjaminside, TX 99918"
+        ],
+        [
+            "001-281-268-2016x432"
+        ],
+        [
+            "http://cole.com/"
+        ],
+        [
+            "Samantha Massey"
+        ],
+        [
+            "cmartinez@example.net"
+        ]
+    ],
+    "Turner, Giles and Torres": [
+        [
+            "34045 Stephens Station Apt. 047\nWest Tiffanyport, WV 40791"
+        ],
+        [
+            "854.122.7076"
+        ],
+        [
+            "https://www.ross.biz/"
+        ],
+        [
+            "Robert Snyder"
+        ],
+        [
+            "rballard@example.com"
+        ]
+    ],
+    "Moore-Parker": [
+        [
+            "915 Williams Mountain\nEast Christopherburgh, SD 87259"
+        ],
+        [
+            "+1-426-449-8056x06328"
+        ],
+        [
+            "http://stevens.com/"
+        ],
+        [
+            "Charles Terry"
+        ],
+        [
+            "morganmary@example.com"
+        ]]}
+print(x)
 
 
-class SampleApp(tk.Tk):
-    def __init__(self):
-        tk.Tk.__init__(self)
-        self.title("Multi-Frame App")
-
-        # Create a container to hold all frames
-        container = tk.Frame(self)
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-
-        self.frames = {}
-
-        # Define the frames and add them to the dictionary
-        for F in (LoginForm, WelcomePage):
-            frame = F(container, self)
-            self.frames[F] = frame
-            frame.grid(row=0, column=0, sticky="nsew")
-
-        # Show the initial frame
-        self.show_frame(LoginForm)
-
-    def show_frame(self, cont):
-        frame = self.frames[cont]
-        frame.tkraise()
+def _buyers_list() -> list:
+    user_keys = list(x.keys())
+    return user_keys
 
 
-class LoginForm(tk.Frame):
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-
-        # Create the widgets for the login form
-        label = tk.Label(self, text="Login Form")
-        label.pack()
-
-        username_label = tk.Label(self, text="Username:")
-        username_label.pack()
-        username_entry = tk.Entry(self)
-        username_entry.pack()
-
-        password_label = tk.Label(self, text="Password:")
-        password_label.pack()
-        password_entry = tk.Entry(self, show="*")
-        password_entry.pack()
-
-        login_button = tk.Button(self, text="Login", command=lambda: self.login(controller))
-        login_button.pack()
-
-    def login(self, controller):
-        # Perform login authentication logic here
-        # For simplicity, let's assume the login is always successful
-        controller.show_frame(WelcomePage)
+def _insert_buyer_info_excel(self):
+    pass
 
 
-class WelcomePage(tk.Frame):
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-
-        # Create the widgets for the welcome page
-        label = tk.Label(self, text="Welcome!")
-        label.pack()
-
-        logout_button = tk.Button(self, text="Logout", command=lambda: controller.show_frame(LoginForm))
-        logout_button.pack()
+def _update(data):
+    buyer_info_combobox['values'] = data
 
 
-if __name__ == "__main__":
-    app = SampleApp()
-    app.mainloop()
+def _check_key(event):
+    value = buyer_info_combobox.get()
+    # get data from la
+    if value == "":
+        data = _buyers_list()
+    else:
+        regex = fr'^{value}'
+        data = [string for string in _buyers_list() if re.match(regex, string)]
+        print(type(data))
+    # update data in combobox
+    _update(data)
+
+root = tk.Tk()
+buyer_info_combobox = ttk.Combobox(root)
+buyer_info_combobox['values'] = _buyers_list()
+buyer_info_combobox.bind("<<ComboboxSelected>>", _check_key)
+buyer_info_combobox.pack()
+root.mainloop()
