@@ -1,4 +1,4 @@
-import math
+
 class ErpCodeCalculator:
     def __init__(self):
         self.erp_codes = {
@@ -36,7 +36,8 @@ class ErpCodeCalculator:
         self.dimension2 = 3500
         self.dimension3 = 4000
         self.length = 10
-
+    def _erp_code_abbreviation(self):
+        return list(self.erp_codes.keys())
     def calculate_PRF(self):
         pass
 
@@ -126,8 +127,3 @@ class ErpCodeCalculator:
     def calculate_MSC(self):
         pass
 
-    def x(self):
-        print("VALUE PLT:",self.calculate_PLT(),'\n',"VAlUE HSS:",self.calculate_HSS(),'\n','VAlUE CHS:',self.calculate_CHS())
-
-
-ErpCodeCalculator().x()
