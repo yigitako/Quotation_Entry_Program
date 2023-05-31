@@ -1,15 +1,13 @@
-import datetime
 import tkinter
 from tkinter import ttk
 from tkinter import *
 from tkinter import messagebox
 import tkinter.font
-import os
 import openpyxl
 import subprocess, os, platform
-import time
-import json
-import re
+from dates import OpenDate
+from Buyer import Customers
+from Header import HeaderEntry
 
 
 # if "yigit Akoymak" in User_Names:
@@ -18,12 +16,13 @@ import re
 #    sheet = workbook.active
 #
 #    workbook.save(filepath)
-class DataEntry:
+class DataEntry(OpenDate, Customers, HeaderEntry):
     def __init__(self):
         self.window = tkinter.Tk()
         self.window.configure(background='#eff0f1')
         # install a new theme called awdark
-        self.window.tk.call('source', 'tkBreeze-master/breeze/breeze.tcl')
+        self.window.tk.call('source', r'C:\Users\yigit\PycharmProjects\Sepkon_enter_data\tkBreeze-master/breeze'
+                                      r'/breeze.tcl')
         self.window.state('zoomed')
         # apply the theme
         self.s = ttk.Style()
@@ -40,10 +39,11 @@ class DataEntry:
         self.buyer_font = ttk.Label(text="Buyer", font=24)
         self.buyer = ttk.LabelFrame(self.window, labelwidget=self.buyer_font)
         self.buyer.grid(row=0, column=0, sticky="NW")
-        # Buyer info
 
+        # Buyer info
         self.buyer_info_label = ttk.Label(self.buyer, text='Buyer name', font=ttk_font)
-        self.buyer_info_combobox = ttk.Combobox(self.buyer)
+        vcmd = self.buyer.register(self.validate)
+        self.buyer_info_combobox = ttk.Combobox(self.buyer, font=ttk_font, validate='key', validatecommand=(vcmd, '%P'))
         self.buyer_info_label.grid(row=0, column=1)
         self.buyer_info_combobox.grid(row=0, column=2)
 
@@ -59,11 +59,15 @@ class DataEntry:
         self.Dead_Line_label = ttk.Label(self.user_info_frame, text="Dead Line", font=ttk_font)
         self.Dead_Line_label.grid(row=0, column=1)
 
-        self.Open_Data_name_entry = ttk.Entry(self.user_info_frame, font=ttk_entry_font)
+        # _Open_Date______________________________________________________________________________________#
+        self.namevar = StringVar()
+        self.Open_Data_name_entry = ttk.Entry(self.user_info_frame, font=ttk_entry_font, textvariable=self.namevar)
         self.Dead_Line_entry = ttk.Entry(self.user_info_frame, font=ttk_entry_font)
         self.Open_Data_name_entry.grid(row=1, column=0)
         self.Dead_Line_entry.grid(row=1, column=1)
-
+        self.Open_Data_name_entry.bind('<Key>', lambda event: self._add_slash_to_time(self.Open_Data_name_entry))
+        self.Dead_Line_entry.bind('<Key>', lambda event: self._add_slash_to_time(self.Dead_Line_entry))
+        # _________________________________________________________________________________________________ #
         self.Request_Type_label = ttk.Label(self.user_info_frame, text="Request Type", font=ttk_font)
         self.Request_Type_Entry = ttk.Entry(self.user_info_frame, font=ttk_entry_font)
         self.Request_Type_label.grid(row=0, column=2)
@@ -79,16 +83,17 @@ class DataEntry:
         self.Required_Delivery = ttk.Entry(self.user_info_frame, font=ttk_entry_font)
         self.Required_Delivery_Label.grid(row=2, column=1)
         self.Required_Delivery.grid(row=3, column=1)
+
         # Origin Restriction
         self.Origin_Restiriction = ttk.Label(self.user_info_frame, text="Origin Restriction", font=ttk_font)
         self.Origin_Restiriction_entry = ttk.Entry(self.user_info_frame, font=ttk_entry_font)
         self.Origin_Restiriction.grid(row=2, column=2)
         self.Origin_Restiriction_entry.grid(row=3, column=2)
         # Operation Restriction
-        self.Operation_Restiriction = ttk.Label(self.user_info_frame, text="Operation Restriction", font=ttk_font)
-        self.Operation_Restiriction_entry = ttk.Entry(self.user_info_frame, font=ttk_entry_font)
-        self.Operation_Restiriction.grid(row=4, column=0)
-        self.Operation_Restiriction_entry.grid(row=5, column=0)
+        # self.Operation_Restiriction = ttk.Label(self.user_info_frame, text="Operation Restriction", font=ttk_font)
+        # self.Operation_Restiriction_entry = ttk.Entry(self.user_info_frame, font=ttk_entry_font)
+        # self.Operation_Restiriction.grid(row=4, column=0)
+        # self.Operation_Restiriction_entry.grid(row=5, column=0)
         # Operation Type
         self.Operation_Type = ttk.Label(self.user_info_frame, text="Operation Type", font=ttk_font)
         self.Operation_Type_entry = ttk.Entry(self.user_info_frame, font=ttk_entry_font)
@@ -101,15 +106,15 @@ class DataEntry:
         self.Project_End_Use_Entry.grid(row=5, column=2)
 
         for widget in self.user_info_frame.winfo_children():
-            widget.grid_configure(padx=5, pady=5)
+            widget.grid_configure(padx=0, pady=0)
 
         for widget in self.buyer.winfo_children():
-            widget.grid_configure(padx=5, pady=5)
+            widget.grid_configure(padx=0, pady=0)
 
         # Saving Course Info
-        self.courses_frame_font = ttk.Label(text="Main", font=ttk_font_header)
+        self.courses_frame_font = ttk.Label(text="Registration Data", font=ttk_font_header)
         self.courses_frame = ttk.LabelFrame(self.window, labelwidget=self.courses_frame_font)
-        self.courses_frame.grid(row=2, column=0, sticky='w')
+        self.courses_frame.grid(row=2, column=0, sticky='NEWS')
 
         # Postion of the excel values
         self.pos_label = ttk.Label(self.courses_frame, text="POS", font=ttk_font)
@@ -152,11 +157,65 @@ class DataEntry:
         self.l_mm_box = ttk.Entry(self.courses_frame, font=ttk_font)
         self.l_mm_label.grid(row=6, column=1)
         self.l_mm_box.grid(row=7, column=1)
-
-        # Quantity
-        # self.kg_p_label = ttk.Label(self.courses_frame,t)
         for widget in self.courses_frame.winfo_children():
             widget.grid_configure(padx=10, pady=5)
+        # SALES TERMS AND CONDITIONS
+        self.sales_terms_conditions_font = ttk.Label(text='SALES TERMS AND CONDITIONS', font=24)
+        self.sales_terms_conditions_frame = ttk.LabelFrame(self.window, labelwidget=self.sales_terms_conditions_font)
+        self.sales_terms_conditions_frame.grid(row=0, column=6, sticky='NE')
+        # Total Order
+        self.total_order_label = ttk.Label(self.sales_terms_conditions_frame, text='Total Order', font=24)
+        self.total_order_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.total_order_label.grid(row=0, column=0)
+        self.total_order_entery.grid(row=1, column=0)
+        # Quantity
+        self.quantity_label = ttk.Label(self.sales_terms_conditions_frame, text='Quantity', font=24)
+        self.quantity_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.quantity_label.grid(row=2, column=0)
+        self.quantity_entery.grid(row=3, column=0)
+        # Delivery Term
+        self.delivery_term_label = ttk.Label(self.sales_terms_conditions_frame, text='Delivery Term', font=24)
+        self.delivery_term_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.delivery_term_label.grid(row=4, column=0)
+        self.delivery_term_entery.grid(row=5, column=0)
+        # Delivery Time
+        self.delivery_time_label = ttk.Label(self.sales_terms_conditions_frame, text='Delivery Time', font=24)
+        self.delivery_time_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.delivery_time_label.grid(row=6, column=0)
+        self.delivery_time_entery.grid(row=7, column=0)
+        # Payment Term
+        self.payment_term_label = ttk.Label(self.sales_terms_conditions_frame, text='Payment Term', font=24)
+        self.payment_term_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.payment_term_label.grid(row=8, column=0)
+        self.payment_term_entery.grid(row=9, column=0)
+        # Origin
+        self.origin_label = ttk.Label(self.sales_terms_conditions_frame, text='Origin', font=24)
+        self.origin_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.origin_label.grid(row=10, column=0)
+        self.origin_entery.grid(row=11, column=0)
+        # Delivery Tol
+        self.delivery_tol_label = ttk.Label(self.sales_terms_conditions_frame, text='Delivery Tol', font=24)
+        self.delivery_tol_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.delivery_tol_label.grid(row=12, column=0)
+        self.delivery_tol_entery.grid(row=13, column=0)
+        # Transport by
+        self.transport_by_label = ttk.Label(self.sales_terms_conditions_frame, text='Transport By', font=24)
+        self.transport_by_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.transport_by_label.grid(row=12, column=0)
+        self.transport_by_entery.grid(row=13, column=0)
+        # Partial Shipments
+        self.partial_shipments_label = ttk.Label(self.sales_terms_conditions_frame, text='Partial Shipments', font=24)
+        self.partial_shipments_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.partial_shipments_label.grid(row=14, column=0)
+        self.partial_shipments_entery.grid(row=15, column=0)
+        # Validity
+        self.validity_label = ttk.Label(self.sales_terms_conditions_frame, text='Partial Shipments', font=24)
+        self.validity_entery = ttk.Entry(self.sales_terms_conditions_frame, font=ttk_font)
+        self.validity_label.grid(row=16, column=0)
+        self.validity_entery.grid(row=17, column=0)
+
+        for widget in self.sales_terms_conditions_frame.winfo_children():
+            widget.grid_configure(padx=50, pady=0)
 
         # Accept terms
         self.terms_frame_font = ttk.Label(text='Terms & Conditions', font=24)
@@ -169,47 +228,20 @@ class DataEntry:
         self.terms_check.grid(row=0, column=0)
 
         # Button enter_data
-        self.button = ttk.Button(self.window, text="enter data", style='my.TButton', command=self.enter_data)
+        self.button = ttk.Button(self.window, text="enter data", style='my.TButton', command=self.enter_data,
+                                 state=DISABLED)
         self.button.grid(row=4, column=0, sticky="news", padx=20, pady=10)
 
         self.window.mainloop()
 
     # -Buyer_combobox-#
-    def _from_json_to_dict(self):
-        with open('user_names.json', 'r') as file:
-            json_data = file.read()
-            data_user = json.loads(json_data)
-        return data_user
 
-    def _buyers_list(self) -> list:
-        # adress F11, tellephone F13,web F14, contact person F16, Email F17
-        usr_sheet_local = ['F11', 'F13', 'F14', 'F16', 'F17']
-        user_keys = list(self._from_json_to_dict().keys())
-        return user_keys
+    # _________________________________________________________________________________________#
+    def validate(self, P):
+        self.button.config(state=(NORMAL if P else DISABLED))
+        return True
 
-    def _insert_buyer_info_excel(self):
-        pass
-
-    def _update(self, data):
-        self.buyer_info_combobox['values'] = data
-
-    def _check_key(self, event):
-        value = self.buyer_info_combobox.get()
-        # get data from la
-        if value == "":
-            data = self._buyers_list()
-        else:
-            regex = fr'^{value}'
-            data = [string for string in self._buyers_list() if re.match(regex, string)]
-        # update data in combobox
-        self._update(data)
-
-    ###################################################################################################################
-    def Date_time(self) -> list:
-        """get the month and day of the current time"""
-        date = datetime.datetime.now()
-        return [str(date.day), str(date.month), str(date.year)[-2:]]
-
+    # _________________________________________________________________________________________#
     def enter_data(self):
         accepted = self.accept_var.get()
         if accepted == "Accepted":
@@ -220,7 +252,6 @@ class DataEntry:
             tax_exception = self.Tax_Exception_Entry.get()
             required_delivery = self.Required_Delivery.get()
             origin_restiriction = self.Origin_Restiriction_entry.get()
-            operation_Restriction = self.Operation_Restiriction_entry.get()
             operation_type = self.Operation_Type_entry.get()
             project_end_use = self.Project_End_Use_Entry.get()
             buyer_name = self.buyer_info_combobox.get()
@@ -233,16 +264,6 @@ class DataEntry:
             dim3 = self.Dimensions3_box.get()
             l_mm = self.l_mm_box.get()
             print(postion, erp, description, dim2, dim1, dim3)
-            # Course info
-            # registration_status = self.reg_status_var.get()
-            # numcourses = self.pos_entry.get()
-            # numsemesters = self.ERP_Entry.get()
-
-            # print("First name: ", open_date, "ERP_GROUP: ", dead_line)
-            # print("Title: ", request_type, "Age: ", tax_exception, "Nationality: ")
-            # print("# Courses: ", numcourses, "# Semesters: ", numsemesters)
-            # print("Registration status", registration_status)
-            # print("------------------------------------------")
 
             filepath = r"C:\Users\yigit\Desktop\excel_data\kk.xlsx"
 
@@ -253,38 +274,25 @@ class DataEntry:
                            "# Courses", "# Semesters", "Registration status"]
                 sheet.append(heading)
                 workbook.save(filepath)
-            workbook = openpyxl.load_workbook(filepath)
+            try:
+                workbook = openpyxl.load_workbook(filepath)
+            except PermissionError:
+                print('The file has been opened ')
             sheet = workbook.active
             # add buyer name to excel
             bynm = sheet['F9']
             bynm.value = buyer_name
-            data = self._buyers_list()[f"{buyer_name}"]
-            for i in range(len(data)):
-                cell_location = usr_sheet_loca[i]
-                cell = sheet[cell_location]
-                cell.value = data[i][0]
-            # Add Open date and deadline
-            opdv, ddl = sheet['S10'], sheet['S11']
-            opdv.value, ddl.value = open_date, dead_line
-            # Request Type, Tax exceptation
-            rtyp, txex = sheet['S12'], sheet['S13']
-            rtyp.value, txex.value = request_type, tax_exception
-            # Requred delivery, Origin Restiriction
-            rqd, org = sheet['S14'], sheet['S15']
-            rqd.value, org.value = required_delivery, origin_restiriction
-            # Operation type, Origin Restriciton
-            # opt = sheet['S16']
-            # opr.value, opt.value = operation_Restriction, origin_restiriction
-            # Add time to the excel
-            time = sheet['S8']
-            time.value = "/ ".join(self.Date_time())
+            Customers()._insert_buyer_info_excel(sheet, buyer_name)
+            HeaderEntry()._header_entry(sheet, open_date, dead_line, request_type, tax_exception, required_delivery,
+                                        origin_restiriction, operation_type, project_end_use)
+            OpenDate()._add_time_to_excel(sheet)
             #
             sheet.append([open_date, dead_line, request_type, tax_exception])
             workbook.save(filepath)
             if platform.system() == 'Windows':
                 os.startfile(filepath)
-        else:
-            tkinter.messagebox.showwarning(title="Error", message="You have not accepted the terms")
+            else:
+                tkinter.messagebox.showwarning(title="Error", message="You have not accepted the terms")
 
 
 def PdfViewer(self):
@@ -298,8 +306,8 @@ def PdfViewer(self):
     # root.mainloop()
 
 
-DataEntry()
-
+de = DataEntry()
+de
 # User_Names = {"yigit Akoymak": [["London, Greenwich, SE10"],
 #                                ["+90 530 068 89 48"],
 #                                ["https://www.yigitakoymak.xyz"],
