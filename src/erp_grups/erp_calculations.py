@@ -1,8 +1,7 @@
-
 class ErpCodeCalculator:
     def __init__(self):
         self.erp_codes = {
-            "PRF": ["Steel Profiles (Beams / Columns / Piles)", None],
+            "PRF": ["Steel Profiles (Beams / Columns / Piles)", None],  # DONE
             "PLT": ["Steel Plates (CS / AS)", None],
             "HSS": ["Hollow Structural Sections", None],
             "PCSW": ["PC Stands and Wires", None],
@@ -36,18 +35,26 @@ class ErpCodeCalculator:
         self.dimension2 = 3500
         self.dimension3 = 4000
         self.length = 10
+
     def _erp_code_abbreviation(self):
         return list(self.erp_codes.keys())
-    def calculate_PRF(self):
-        pass
 
+    def calculate_PRF(self, prf_value):
+        # YUKARIYUVARLA(ÇAPRAZARA(J21, UWList!A: A, UWList!B: B)*M21 * O21 / 1000, 0)
+        ls = {'HEA 100': 16.7}
+        # abs(ls[prf_value]9)
 
-    def calculate_PLT(self):
-        return (self.dimension1 * self.dimension2 * self.length) * 7.85 / 1_000_000
+    def calculate_PLT(self, d1, d2, d3, pc3):
+        # d1 = d2 = 2000 d3 = 6000 pc = 3
+        if self.density is None:
+            return int((d1 * d2 * d3 * 7.85) / 1_000_000) * pc3
+        else:
+            return int((d1 * d2 * d3 * self.density) / 1_000_000) * pc3
 
     def calculate_HSS(self):
-        return self.length * (abs((abs((self.dimension1 * self.dimension2)) - abs(self.dimension1 - (2 * self.dimension3))) * (
-                abs(self.dimension2 - (2 * self.dimension3)))) * 7.85) / 1_000_000
+        return self.length * (
+                abs((abs((self.dimension1 * self.dimension2)) - abs(self.dimension1 - (2 * self.dimension3))) * (
+                    abs(self.dimension2 - (2 * self.dimension3)))) * 7.85) / 1_000_000
 
     def calculate_PCSW(self):
         pass
@@ -127,3 +134,4 @@ class ErpCodeCalculator:
     def calculate_MSC(self):
         pass
 
+# print(ErpCodeCalculator(8).calculate_PLT(5, 1500, 6000, 1))

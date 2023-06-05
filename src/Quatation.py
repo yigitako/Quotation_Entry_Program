@@ -1,4 +1,7 @@
-class Quatations():
+from erp_grups.erp_calculations import ErpCodeCalculator
+
+
+class Quatations:
     def _quatations_entry_to(self, sheet, postion, erp, description, dim1, dim2, dim3, l_mm):
         # Add postion
         pos = sheet['B21']
@@ -8,9 +11,12 @@ class Quatations():
         erp_.value = erp
         # add Description
         description_ = sheet['D21']
-        description_.value = self.erp_codes['PRF'][0]
-        description__ = sheet['H21']
-        description__ = description
+        if erp in ErpCodeCalculator().erp_codes.keys():
+            description_.value = ErpCodeCalculator().erp_codes[erp][0]
+        else:
+            description_.value = None
+        description__ = sheet['D22']
+        description__.value = description
         # Dimension 1
         dim1_ = sheet['J21']
         dim1_.value = dim1
@@ -22,4 +28,4 @@ class Quatations():
         dim3_.value = dim3
         # l-mm
         l_mm_ = sheet['M21']
-        l_mm_.value - l_mm
+        l_mm_.value = l_mm
