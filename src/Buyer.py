@@ -10,7 +10,7 @@ class Customers:
             data_user = json.loads(json_data)
         return data_user
 
-    def _buyers_list(self) -> list:
+    def _from_dict_keys_to_list(self) -> list:
         user_keys = list(self._from_json_to_dict().keys())
         return user_keys
 
@@ -25,12 +25,12 @@ class Customers:
         value = self.buyer_info_combobox.get()
         # get data from la
         if value == "":
-            data = self._buyers_list()
+            data = self._from_dict_keys_to_list()
         else:
             regex = fr'^{value}'
-            data = [string for string in self._buyers_list() if re.match(regex, string)]
+            data = [string for string in self._from_dict_keys_to_list() if re.match(regex, string)]
         # update data in combobox
-        self._update_buyer_names(data)
+        self._update_buyer_info_combobox(data)
 
-    def _update_buyer_names(self, data):
+    def _update_buyer_info_combobox(self, data):
         self.buyer_info_combobox['values'] = data

@@ -87,18 +87,32 @@ class ModernEntry:
         popup_menu.post(x, y)
 
 
-import tkinter as tk
-from tkinter import ttk
+def x():
+    dim1 = 1
+    dim11 = 2
+    dim2 = 3
+    dim4 = 5
+    return [[dim1, dim11], [dim2, dim4]]
 
-#def open_dropdown(event):
-#    combobox.after(1, lambda: combobox.event_generate('<Down>'))
+
+def y(d, f, z):
+    return d, f, z
+
+
+print(y(x()[1][0], x()[0][0], x()[0][1]))
+
+# import tkinter as tk
+# from tkinter import ttk
+#
+# def open_dropdown(event):
+#    combobox.after(10, lambda: combobox.event_generate('<Down>'))
 #    combobox.after(10, lambda: combobox.event_generate("<Entry>"))
+#
+# root = tk.Tk()
+#
+# combobox = ttk.Combobox(root, values=["Option 1", "Option 2", "Option 3"])
+# combobox.state(['focus'])
+# combobox.pack()
+# combobox.bind("<KeyPress>")
 
-root = tk.Tk()
-
-combobox = ttk.Combobox(root, values=["Option 1", "Option 2", "Option 3"])
-combobox.state(['focus'])
-combobox.pack()
-combobox.bind("<KeyPress>")
-
-root.mainloop()
+# root.mainloop()

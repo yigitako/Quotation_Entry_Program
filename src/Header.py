@@ -1,5 +1,5 @@
 import re
-import tkinter
+
 
 class HeaderEntry:
     def __init__(self):

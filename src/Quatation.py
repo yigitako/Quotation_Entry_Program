@@ -1,7 +1,9 @@
 from erp_grups.erp_calculations import ErpCodeCalculator
 
 
-class Quatations:
+
+
+class Quotations:
     def _quatations_entry_to(self, sheet, postion, erp, description, dim1, dim2, dim3, l_mm):
         # Add postion
         pos = sheet['B21']
