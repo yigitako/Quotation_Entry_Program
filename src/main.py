@@ -3,19 +3,25 @@ from tkinter import ttk
 from tkinter import *
 import tkinter.font
 import openpyxl
+
+from pathlib import Path
 import os
 import platform
+
 from dates import OpenDate
 from Buyer import Customers
 from Header import HeaderEntry
+
 from src.erp_grups.erp_calculations import ErpCodeCalculator
 from src.Quatation import Quotations
 from src.sales_terms import SalesAndTerms
 from src.widgets.Quatation_entries import QuotationEntries
-from pathlib import Path
+from src.widgets.Sales_terms_entreis import SalesTermsConditionsEntry
+from src.widgets.header_entries import HeaderEntries
 
 
-class DataEntry(OpenDate, Customers, HeaderEntry, ErpCodeCalculator, Quotations, SalesAndTerms, QuotationEntries):
+class DataEntry(OpenDate, Customers, HeaderEntry, ErpCodeCalculator, Quotations, SalesAndTerms, QuotationEntries,
+                SalesTermsConditionsEntry, HeaderEntries):
     notebook_tab_index = []
 
     def __init__(self):
@@ -23,30 +29,31 @@ class DataEntry(OpenDate, Customers, HeaderEntry, ErpCodeCalculator, Quotations,
 
         self.window = tkinter.Tk()
         self.window.configure(background='#eff0f1')
-        self.window.tk.call('source', r'C:\Users\yigit\PycharmProjects\Sepkon_enter_data\tkBreeze-master/breeze-dark'
-                                      r'/breeze-dark.tcl')
+        self.window.tk.call('source', r'C:\Users\yigit\PycharmProjects\Sepkon_enter_data\tkBreeze-master/breeze'
+                                      r'/breeze.tcl')
         self.window.state('zoomed')
         self.s = ttk.Style()
-        self.s.theme_use('breeze-dark')
+        self.s.theme_use('breeze')
         self.s.configure('TNotebook.Tab', font=('HACK', 14))
-        self.s.configure("my.TButton", font=("Hack", 14))
+        self.s.configure("my.TButton", font=("Hack", 14), )
         self.s.configure('TNotebook.Tab', background="blue")
         self.s.map("TNotebook", background=[("selected", "red")])
-        # title of the window
+
         self.window.title("Data Entry Sepkon")
         self.notebook = ttk.Notebook(self.window)
-        self.notebook.pack()  # fill='nswe', expand=True
-        self.notebook.grid(row=0, column=0)  # sticky='W'
+        self.notebook.pack()
+        self.notebook.grid(row=0, column=0)
 
-        self.frame1 = ttk.Frame(self.notebook, width=self.window.winfo_width(),
-                                height=self.window.winfo_height())
+        self.frame1 = Frame(self.notebook, width=self.window.winfo_width(),
+                            height=self.window.winfo_height())
 
-        self.frame2 = ttk.Frame(self.notebook, width=self.window.winfo_width(),
-                                height=self.window.winfo_height())
+        self.frame2 = Frame(self.notebook, width=self.window.winfo_width(),
+                            height=self.window.winfo_height())
+
         self.labelframe = LabelFrame(self.frame2, text="This is a LabelFrame")
 
         self.labelframe.grid(row=7, column=1)
-        self.frame4 = ttk.Frame(self.notebook, width=400, height=280)
+        self.frame4 = Frame(self.notebook, width=400, height=280)
         self.frame3 = ttk.Frame(self.notebook)
 
         self.frame1.pack(fill='both', expand=True)
@@ -85,63 +92,65 @@ class DataEntry(OpenDate, Customers, HeaderEntry, ErpCodeCalculator, Quotations,
         self.Dead_Line_label = ttk.Label(self.frame1, text="Dead Line", font=ttk_font)
         self.Dead_Line_label.grid(row=1, column=1)
 
-        # _Open_Date______________________________________________________________________________________#
         self.Open_Data_name_entry = ttk.Entry(self.frame1, font=ttk_entry_font)
         self.Dead_Line_entry = ttk.Entry(self.frame1, font=ttk_entry_font)
         self.Open_Data_name_entry.grid(row=2, column=0)
         self.Dead_Line_entry.grid(row=2, column=1)
-        # self.Open_Data_name_entry.bind('<Key>', lambda event: self._add_slash_to_time(self.Open_Data_name_entry))
-        # self.Dead_Line_entry.bind('<Key>', lambda event: self._add_slash_to_time(self.Dead_Line_entry))
-        # _________________________________________________________________________________________________ #
-        self.Request_Type_label = ttk.Label(self.frame1, text="Request Type", font=ttk_font)
-        self.Request_Type_Entry = ttk.Entry(self.frame1, font=ttk_entry_font)
-        self.Request_Type_label.grid(row=3, column=0)
-        self.Request_Type_Entry.grid(row=4, column=0)
-        # tax Exception section
-        self.Tax_Exception_Label = ttk.Label(self.frame1, text="Tax Exception", font=ttk_font)
-        self.Tax_Exception_Entry = ttk.Entry(self.frame1, font=ttk_entry_font)
-        self.Tax_Exception_Label.grid(row=3, column=1)
-        self.Tax_Exception_Entry.grid(row=4, column=1)
 
-        # Required Delivery
-        self.Required_Delivery_Label = ttk.Label(self.frame1, text="Requited Delivery", font=ttk_font)
-        self.Required_Delivery = ttk.Entry(self.frame1, font=ttk_entry_font)
-        self.Required_Delivery_Label.grid(row=5, column=0)
-        self.Required_Delivery.grid(row=6, column=0)
-
-        # Origin Restriction
-        self.Origin_Restiriction = ttk.Label(self.frame1, text="Origin Restriction", font=ttk_font)
-        self.Origin_Restiriction_combobox = ttk.Combobox(self.frame1, font=ttk_entry_font)
-        self.Origin_Restiriction.grid(row=5, column=1)
-        self.Origin_Restiriction_combobox.grid(row=6, column=1)
-        self.Origin_Restiriction_combobox.bind("<KeyRelease>", self._origin_check_key)
-        # Operation Type
-        self.Operation_Type = ttk.Label(self.frame1, text="Operation Type", font=ttk_font)
-        self.Operation_Type_entry = ttk.Entry(self.frame1, font=ttk_entry_font)
-        self.Operation_Type.grid(row=7, column=0)
-        self.Operation_Type_entry.grid(row=8, column=0)
-        # Project end use
-        self.Project_End_Use_Label = ttk.Label(self.frame1, text="Project end use", font=ttk_font)
-        self.Project_End_Use_Entry = ttk.Entry(self.frame1, font=ttk_entry_font)
-        self.Project_End_Use_Label.grid(row=7, column=1)
-        self.Project_End_Use_Entry.grid(row=8, column=1)
+        self.Request_Type_Entry = self._request_type_entry(self.frame1, ttk_font, ttk_entry_font)
+        self.Tax_Exception_Entry = self._tax_exception_entry(self.frame1, ttk_font, ttk_entry_font)
+        self.Required_Delivery = self.required_delivery_entry(self.frame1, ttk_font, ttk_entry_font)
+        self.Origin_Restiriction_combobox = self._origin_restriction_entry(self.frame1, ttk_font, ttk_entry_font,
+                                                                           self._origin_check_key)
+        self.Operation_Type_entry = self._operation_type_entry(self.frame1, ttk_font, ttk_entry_font)
+        self.Project_End_Use_Entry = self._project_end_use_entry(self.frame1, ttk_font, ttk_entry_font)
 
         self.__line__(self.frame2, ttk_font)
 
-
         self.pos_entry = QuotationEntries().pos_label_entry(self.frame2, ttk_font)
+
         self.ERP_Entry = QuotationEntries().erp_grup_label(self.frame2, ttk_font,
                                                            ErpCodeCalculator()._erp_code_abbreviation())
+
         self.Description_box = QuotationEntries().Description(self.frame2, ttk_font)
+
         self.Dimensions_box = QuotationEntries().Dimension_1(self.frame2, ttk_font)
+
         self.Dimensions2_box = QuotationEntries().Dimension_2(self.frame2, ttk_font)
+
         self.Dimensions3_box = QuotationEntries().Dimension_3(self.frame2, ttk_font)
+
         self.l_mm_box = QuotationEntries().l_mm_label_entry(self.frame2, ttk_font)
 
-        event = None
+        self.get_combobox_value(None, self.frame2, ttk_font, self.pos_entry, self.ERP_Entry, self.Description_box,
+                                self.Dimensions_box, self.Dimensions2_box, self.Dimensions3_box, self.l_mm_box)
+        # Sales and Terms
 
-        self.get_combobox_value(event, self.frame2, ttk_font, self.pos_entry, self.ERP_Entry, self.Description_box,
-                                    self.Dimensions_box, self.Dimensions2_box, self.Dimensions3_box, self.l_mm_box)
+        self.total_order_entery = self._total_order_entry(self.frame4, ttk_font)
+
+        self.quantity_entry = self._quantity_entry(self.frame4, ttk_font)
+
+        self.delivery_term_entry = self._delivery_term_entry(self.frame4, ttk_font)
+
+        self.delivery_time_entry = self._delivery_time_entry(self.frame4, ttk_font)
+
+        self.payment_term_entry = self._payment_term_entry(self.frame4, ttk_font)
+
+        self.origin_entry = self._origin_entry(self.frame4, ttk_font)
+
+        self.delivery_tol_entry = self._delivery_tol_entry(self.frame4, ttk_font)
+
+        self.transport_by_entry = self._transport_by_entry(self.frame4, ttk_font)
+
+        self.partial_shipments_entry = self._partial_shipments_entry(self.frame4, ttk_font)
+
+        self.validity_entry = self._validity_entry(self.frame4, ttk_font)
+
+        self.button = ttk.Button(self.window, text="Enter data", style='my.TButton',
+                                 command=self._put_data_to_excel,
+                                 state=DISABLED)
+
+        self.button.grid(row=3, column=0, sticky="news")
 
         for widget in self.frame1.winfo_children():
             widget.grid_configure(padx=50, pady=10)
@@ -149,81 +158,11 @@ class DataEntry(OpenDate, Customers, HeaderEntry, ErpCodeCalculator, Quotations,
         for widget in self.frame2.winfo_children():
             widget.grid_configure(padx=50, pady=10)
 
-        # SALES TERMS AND CONDITIONS
-        self.sales_terms_conditions_font = ttk.Label(text='SALES TERMS AND CONDITIONS', font=24)
-        self.sales_terms_conditions_frame = ttk.LabelFrame(self.window, labelwidget=self.sales_terms_conditions_font)
-        # self.sales_terms_conditions_frame.grid(row=0, column=6, sticky='NE')
-        # Total Order
-        self.total_order_label = ttk.Label(self.frame4, text='Total Order', font=24)
-        self.total_order_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.total_order_label.grid(row=0, column=0)
-        self.total_order_entery.grid(row=1, column=0)
-        # Quantity
-        self.quantity_label = ttk.Label(self.frame4, text='Quantity', font=24)
-        self.quantity_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.quantity_label.grid(row=0, column=1)
-        self.quantity_entery.grid(row=1, column=1)
-
-        # Delivery Term
-        self.delivery_term_label = ttk.Label(self.frame4, text='Delivery Term', font=24)
-        self.delivery_term_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.delivery_term_label.grid(row=4, column=0)
-        self.delivery_term_entery.grid(row=5, column=0)
-        # Delivery Time
-        self.delivery_time_label = ttk.Label(self.frame4, text='Delivery Time', font=24)
-        self.delivery_time_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.delivery_time_label.grid(row=4, column=1)
-        self.delivery_time_entery.grid(row=5, column=1)
-        # Payment Term
-        self.payment_term_label = ttk.Label(self.frame4, text='Payment Term', font=24)
-        self.payment_term_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.payment_term_label.grid(row=6, column=0)
-        self.payment_term_entery.grid(row=7, column=0)
-        # Origin
-        self.origin_label = ttk.Label(self.frame4, text='Origin', font=24)
-        self.origin_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.origin_label.grid(row=6, column=1)
-        self.origin_entery.grid(row=7, column=1)
-        # Delivery Tol
-        self.delivery_tol_label = ttk.Label(self.frame4, text='Delivery Tol', font=24)
-        self.delivery_tol_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.delivery_tol_label.grid(row=8, column=0)
-        self.delivery_tol_entery.grid(row=9, column=0)
-        # Transport by
-        self.transport_by_label = ttk.Label(self.frame4, text='Transport By', font=24)
-        self.transport_by_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.transport_by_label.grid(row=8, column=1)
-        self.transport_by_entery.grid(row=9, column=1)
-        # Partial Shipments
-        self.partial_shipments_label = ttk.Label(self.frame4, text='Partial Shipments', font=24)
-        self.partial_shipments_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.partial_shipments_label.grid(row=10, column=0)
-        self.partial_shipments_entery.grid(row=11, column=0)
-        # Validity
-        self.validity_label = ttk.Label(self.frame4, text='Partial Shipments', font=24)
-        self.validity_entery = ttk.Entry(self.frame4, font=ttk_font)
-        self.validity_label.grid(row=10, column=1)
-        self.validity_entery.grid(row=11, column=1)
-
         for widget in self.frame4.winfo_children():
             widget.grid_configure(padx=50, pady=10)
 
-        # Accept terms
-        self.terms_frame_font = ttk.Label(text='Terms & Conditions', font=24)
-        self.terms_frame = ttk.LabelFrame(self.window, labelwidget=self.terms_frame_font)
-        # self.terms_frame.grid(row=3, column=0, sticky='nwes')
-        self.accept_var_font = ttk.Label(text="I accept the terms and conditions.", font=14)
-        self.accept_var = tkinter.StringVar(value="Not Accepted")
-        self.terms_check = ttk.Checkbutton(self.terms_frame, text="I accept the terms and conditions.",
-                                           variable=self.accept_var, onvalue="Accepted", offvalue="Not Accepted")
-        self.terms_check.grid(row=0, column=0)
-
-        # Button enter_data
-        self.button = ttk.Button(self.window, text="Enter data", style='my.TButton',
-                                 command=self._put_data_to_excel,
-                                 state=DISABLED)
-
-        self.button.grid(row=3, column=0, sticky="news")
+        F5 = Frame(self.window, bd=10, relief='groove')
+        F5.place(x=1010, y=180, width=350, height=380)
 
         self.window.mainloop()
 
@@ -296,23 +235,23 @@ class DataEntry(OpenDate, Customers, HeaderEntry, ErpCodeCalculator, Quotations,
     def _from_sales_and_terms_entries_get_value(self):
         total_order = self.total_order_entery.get()
 
-        quantity = self.quantity_entery.get()
+        quantity = self.quantity_entry.get()
 
-        delivery_term = self.delivery_term_entery.get()
+        delivery_term = self.delivery_term_entry.get()
 
-        delivery_time = self.delivery_time_entery.get()
+        delivery_time = self.delivery_time_entry.get()
 
-        payment_term = self.payment_term_entery.get()
+        payment_term = self.payment_term_entry.get()
 
-        origin = self.origin_entery.get()
+        origin = self.origin_entry.get()
 
-        delivery_tol = self.delivery_tol_entery.get()
+        delivery_tol = self.delivery_tol_entry.get()
 
-        transport_by = self.transport_by_entery.get()
+        transport_by = self.transport_by_entry.get()
 
-        partial_shipment = self.partial_shipments_entery.get()
+        partial_shipment = self.partial_shipments_entry.get()
 
-        validity = self.validity_entery.get()
+        validity = self.validity_entry.get()
 
         sales_terms_and_conditions = [total_order, quantity, delivery_term, delivery_time, payment_term, origin,
                                       delivery_tol, transport_by, partial_shipment, validity]
@@ -365,7 +304,8 @@ class DataEntry(OpenDate, Customers, HeaderEntry, ErpCodeCalculator, Quotations,
                                           self._from_quatation_entries_get_value()[3],
                                           self._from_quatation_entries_get_value()[4],
                                           self._from_quatation_entries_get_value()[5],
-                                          self._from_quatation_entries_get_value()[6]
+                                          self._from_quatation_entries_get_value()[6],
+                                          self._selected_value(None)
                                           )
 
         workbook.save(

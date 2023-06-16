@@ -42,7 +42,9 @@ class ErpCodeCalculator:
     def calculate_PRF(self, prf_value):
         # YUKARIYUVARLA(ÇAPRAZARA(J21, UWList!A: A, UWList!B: B)*M21 * O21 / 1000, 0)
         ls = {'HEA 100': 16.7}
-        # abs(ls[prf_value]9)
+        if prf_value in ls:
+            print(f'uw value of {prf_value}: {ls[prf_value]}')
+
 
     def calculate_PLT(self, d1, d2, d3, pc3):
         # d1 = d2 = 2000 d3 = 6000 pc = 3
@@ -65,9 +67,8 @@ class ErpCodeCalculator:
     def calculate_CFC(self):
         pass
 
-    def calculate_CHS(self):
-        return self.dimension2 * (self.dimension1 - self.dimension2) / 40, 55 * self.length
-
+    def calculate_CHS(self, dimension3, dimension1):
+        return ((dimension1 - dimension3) * dimension3) / 40.5 * 1
     def calculate_SWP(self):
         pass
 
@@ -134,4 +135,5 @@ class ErpCodeCalculator:
     def calculate_MSC(self):
         pass
 
-# print(ErpCodeCalculator(8).calculate_PLT(5, 1500, 6000, 1))
+
+print(ErpCodeCalculator().calculate_PRF('HEA 100'))
